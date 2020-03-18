@@ -1,12 +1,18 @@
-import { CommandBase, ICommandArgs} from '../node';
+import { CommandBase } from '../node';
 import { VimState } from '../../state/vimState';
-
-export interface IUndoCommandArgs extends ICommandArgs {
-  steps: number,
-}
+import { StatusBar } from '../../statusBar';
+import { Range } from '../../common/motion/range';
 
 export class UndoCommand extends CommandBase {
   async execute(vimState: VimState): Promise<void> {
-    vimState.historyTracker.goBackHistoryStep();
+    const newPositions = await vimState.historyTracker.goBackHistoryStep();
+
+    if (newPositions === undefined) {
+      StatusBar.setText(vimState, 'Already at oldest change');
+    } else {
+      vimState.cursors = newPositions.map(x => new Range(x, x));
+    }
+
+    vimState.alteredHistory = true;
   }
 }

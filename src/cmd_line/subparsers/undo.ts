@@ -1,5 +1,5 @@
-import { IUndoCommandArgs, UndoCommand } from '../commands/undo';
+import { UndoCommand } from '../commands/undo';
 
-export function parseUndoCommandArgs(args: string): UndoCommand {
+export function parseUndoCommandArgs(): UndoCommand {
   return new UndoCommand();
 }

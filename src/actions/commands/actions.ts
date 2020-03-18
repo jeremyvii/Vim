@@ -8,6 +8,7 @@ import { Clipboard } from '../../util/clipboard';
 import { FileCommand } from './../../cmd_line/commands/file';
 import { OnlyCommand } from './../../cmd_line/commands/only';
 import { QuitCommand } from './../../cmd_line/commands/quit';
+import { UndoCommand } from './../../cmd_line/commands/undo';
 import { Tab, TabCommand } from './../../cmd_line/commands/tab';
 import { Position, PositionDiff, PositionDiffType } from './../../common/motion/position';
 import { Range } from './../../common/motion/range';
@@ -2069,15 +2070,7 @@ class CommandUndo extends BaseCommand {
   mightChangeDocument = true;
 
   public async exec(position: Position, vimState: VimState): Promise<VimState> {
-    const newPositions = await vimState.historyTracker.goBackHistoryStep();
-
-    if (newPositions === undefined) {
-      StatusBar.setText(vimState, 'Already at oldest change');
-    } else {
-      vimState.cursors = newPositions.map(x => new Range(x, x));
-    }
-
-    vimState.alteredHistory = true;
+    new UndoCommand().execute(vimState);
 
     return vimState;
   }
