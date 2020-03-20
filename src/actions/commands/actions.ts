@@ -2070,7 +2070,15 @@ class CommandUndo extends BaseCommand {
   mightChangeDocument = true;
 
   public async exec(position: Position, vimState: VimState): Promise<VimState> {
-    new UndoCommand().execute(vimState);
+    const newPositions = await vimState.historyTracker.goBackHistoryStep();
+
+    if (newPositions === undefined) {
+      StatusBar.setText(vimState, 'Already at oldest change');
+    } else {
+      vimState.cursors = newPositions.map(x => new Range(x, x));
+    }
+
+    vimState.alteredHistory = true;
 
     return vimState;
   }
